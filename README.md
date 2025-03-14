@@ -20,3 +20,10 @@ This is a simple game where players match names to pictures of relatives. The ga
 
 ## License
 This project is licensed under the MIT License.
+
+## Using Git in Cursor
+You can manage Git operations directly from Cursor's GUI:
+1. Click the Source Control icon in the left sidebar
+2. Stage changes by clicking the + next to modified files
+3. Enter a commit message and click "Commit"
+4. Click "Sync Changes" to push to GitHub
