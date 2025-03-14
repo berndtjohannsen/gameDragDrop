@@ -142,36 +142,26 @@ class GameScene extends Phaser.Scene {
         if (this.gameConfig.backgroundSound) {
             console.log('Setting up background music:', this.gameConfig.backgroundSound);
             try {
-                if (!globalBackgroundMusic) {
-                    console.log('Creating new background music instance');
-                    this.backgroundMusic = this.sound.add('background_sound', {
-                        volume: 0.1,
-                        loop: true
-                    });
-                    globalBackgroundMusic = this.backgroundMusic;
-                    
-                    // Add error handling for sound playing
-                    this.backgroundMusic.on('play', () => {
-                        console.log('Background music started playing');
-                    });
-                    
-                    this.backgroundMusic.on('error', (error) => {
-                        console.error('Error playing background music:', error);
-                    });
-                    
-                    this.backgroundMusic.play();
-                } else {
-                    console.log('Reusing existing background music instance');
-                    const musicWasPlaying = globalBackgroundMusic.isPlaying;
-                    this.backgroundMusic = this.sound.add('background_sound', {
-                        volume: 0.1,
-                        loop: true
-                    });
-                    globalBackgroundMusic = this.backgroundMusic;
-                    if (musicWasPlaying) {
-                        this.backgroundMusic.play();
-                    }
-                }
+                // Always create a new background music instance
+                this.backgroundMusic = this.sound.add('background_sound', {
+                    volume: 0.1,
+                    loop: true
+                });
+                
+                // Update global reference
+                globalBackgroundMusic = this.backgroundMusic;
+                
+                // Add error handling for sound playing
+                this.backgroundMusic.on('play', () => {
+                    console.log('Background music started playing');
+                });
+                
+                this.backgroundMusic.on('error', (error) => {
+                    console.error('Error playing background music:', error);
+                });
+                
+                // Start playing
+                this.backgroundMusic.play();
             } catch (e) {
                 console.error("Error handling background music:", e);
             }
@@ -450,6 +440,25 @@ class GameScene extends Phaser.Scene {
         if (this.isTransitioning) return;
         this.isTransitioning = true;
 
+        // Stop and destroy global background music if it exists
+        if (globalBackgroundMusic) {
+            try {
+                if (globalBackgroundMusic.isPlaying) {
+                    globalBackgroundMusic.stop();
+                }
+                if (globalBackgroundMusic.source) {
+                    try {
+                        globalBackgroundMusic.source.disconnect();
+                    } catch (e) {
+                        console.warn("Error disconnecting background music source:", e);
+                    }
+                }
+                globalBackgroundMusic = null;
+            } catch (e) {
+                console.warn("Error cleaning up global background music:", e);
+            }
+        }
+
         // Remove all name elements
         this.nameElements.forEach(element => {
             if (element.parentNode) {
@@ -478,23 +487,74 @@ class GameScene extends Phaser.Scene {
         // Remove all confetti
         document.querySelectorAll('.confetti').forEach(c => c.parentNode?.removeChild(c));
         
-        // Clean up sounds
+        // Clean up sounds safely
         if (this.backgroundMusic) {
-            this.backgroundMusic.stop();
-            this.backgroundMusic.destroy();
+            try {
+                if (this.backgroundMusic.isPlaying) {
+                    this.backgroundMusic.stop();
+                }
+                if (this.backgroundMusic.source) {
+                    try {
+                        this.backgroundMusic.source.disconnect();
+                    } catch (e) {
+                        console.warn("Error disconnecting background music source:", e);
+                    }
+                }
+            } catch (e) {
+                console.warn("Error cleaning up background music:", e);
+            }
         }
+
         if (this.completionSound) {
-            this.completionSound.destroy();
+            try {
+                if (this.completionSound.isPlaying) {
+                    this.completionSound.stop();
+                }
+                if (this.completionSound.source) {
+                    try {
+                        this.completionSound.source.disconnect();
+                    } catch (e) {
+                        console.warn("Error disconnecting completion sound source:", e);
+                    }
+                }
+            } catch (e) {
+                console.warn("Error cleaning up completion sound:", e);
+            }
         }
+
         if (this.wrongSound) {
-            this.wrongSound.destroy();
+            try {
+                if (this.wrongSound.isPlaying) {
+                    this.wrongSound.stop();
+                }
+                if (this.wrongSound.source) {
+                    try {
+                        this.wrongSound.source.disconnect();
+                    } catch (e) {
+                        console.warn("Error disconnecting wrong sound source:", e);
+                    }
+                }
+            } catch (e) {
+                console.warn("Error cleaning up wrong sound:", e);
+            }
         }
         
         // Clean up item sounds
-        if (this.items) {
-            this.items.forEach(item => {
-                if (item.sound) {
-                    item.sound.destroy();
+        if (this.itemSounds) {
+            Object.values(this.itemSounds).forEach(sound => {
+                try {
+                    if (sound.isPlaying) {
+                        sound.stop();
+                    }
+                    if (sound.source) {
+                        try {
+                            sound.source.disconnect();
+                        } catch (e) {
+                            console.warn("Error disconnecting item sound source:", e);
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Error cleaning up item sound:", e);
                 }
             });
         }
