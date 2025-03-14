@@ -1,0 +1,29 @@
+###############################################
+# Configuration file for drag and drop games
+###############################################
+
+Game:1
+Name: "Familj"
+Directory: ./Familj
+Background-image: background.jpg
+Background-sound: background_sound.mp3
+Completion-sound: complete.mp3
+Fail-sound: oops.mp3
+Item 1: "Mamma", mamma.jpg, yipee.mp3
+Item 2: "Pappa", pappa.jpg, yipee.mp3
+Item 3: "Ruth", ruth.jpg, yipee.mp3
+Item 4: "Esther", esther.jpg, yipee.mp3
+
+
+Game:2
+Name: "Djur"
+Directory: ./Djur
+Background-image: background.jpg
+Background-sound: background_sound.mp3
+Completion-sound: complete.mp3
+Fail-sound: oops.mp3
+Item 1: "Ko", ko.jpg, ko.mp3
+Item 2: "Häst", hast.jpg, hast.mp3
+Item 3: "Gris", gris.jpg, gris.mp3
+Item 4: "Anka", anka.jpg, anka.mp3
+

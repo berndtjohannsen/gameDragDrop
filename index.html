@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dra och Släpp</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@700&display=swap">
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+</head>
+<body>
+    <div id="game-container">
+        <div id="splash-screen">
+            <div id="splash-title">Välj spel</div>
+            <div id="game-selection">
+                <!-- Game buttons will be added here dynamically -->
+            </div>
+        </div>
+    </div>
+    
+    <script src="audio-patch.js"></script>
+    <script src="utils.js"></script>
+    <script src="game-scene.js"></script>
+    <script src="game-init.js"></script>
+    <script src="list-games.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize game selection
+            initializeGameSelection();
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (gameInstance) {
+                safeDestroyGame();
+            }
+        });
+    </script>
+</body>
+</html>
