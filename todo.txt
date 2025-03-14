@@ -1,6 +1,5 @@
 Things to maybe do sometimes...
 - Remove debug printouts
-- ask AI to cleanup
-- create favicon
+- ask AI to clean
 - exit button from game
 - dynamic upload of pictures/sounds
