@@ -27,3 +27,27 @@ Item 2: "Häst", hast.jpg, hast.mp3
 Item 3: "Gris", gris.jpg, gris.mp3
 Item 4: "Anka", anka.jpg, anka.mp3
 
+Game:3
+Name: "Djungel"
+Directory: ./Djungel
+Background-image: djungel.jpg
+Background-sound: djungel.mp3
+Completion-sound: cheering.mp3
+Fail-sound: eheh.mp3
+Item 1: "Apa", apa.jpg, apa.mp3
+Item 2: "Elefant", elefant.jpg, elefant.mp3
+Item 3: "Lejon", lejon.jpg, lejon.mp3
+Item 4: "Orm", orm.jpg, orm.mp3
+
+Game:4
+Name: "Mat"
+Directory: ./Mat
+Background-image: kok.jpg
+Background-sound: kok.mp3
+Completion-sound: hurra.mp3
+Fail-sound: nono.mp3
+Item 1: "Bulle", bulle.jpg, korv.mp3
+Item 2: "Korv", korv.jpg, korv.mp3
+Item 3: "Mjolk", mjolk.jpg, mjolk.mp3
+Item 4: "Pasta", pasta.jpg, pasta.mp3
+
