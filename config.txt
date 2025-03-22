@@ -46,8 +46,19 @@ Background-image: kok.jpg
 Background-sound: kok.mp3
 Completion-sound: hurra.mp3
 Fail-sound: nono.mp3
-Item 1: "Bulle", bulle.jpg, korv.mp3
+Item 1: "Bulle", bulle.jpg, bulle.mp3
 Item 2: "Korv", korv.jpg, korv.mp3
 Item 3: "Mjolk", mjolk.jpg, mjolk.mp3
 Item 4: "Pasta", pasta.jpg, pasta.mp3
 
+Game:5
+Name: "Frukt"
+Directory: ./Frukt
+Background-image: tradgard.jpg
+Background-sound: garden.mp3
+Completion-sound: complete.mp3
+Fail-sound: fail.mp3
+Item 1: "Apelsin", apelsin.jpg, wow.mp3
+Item 2: "Äpple", apple.jpg, skratt.mp3
+Item 3: "Avokado", avokado.jpg, avokado.mp3
+Item 4: "Jordgubbe", jordgubbe.jpg, yummi.mp3
