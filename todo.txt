@@ -1,5 +1,6 @@
 Things to maybe do sometimes...
 - Remove debug printouts
-- ask AI to clean
+- ask AI to clean/refactor
 - exit button from game
 - dynamic upload of pictures/sounds
+- load games from github (url)

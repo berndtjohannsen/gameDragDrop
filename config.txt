@@ -3,19 +3,6 @@
 ###############################################
 
 Game:1
-Name: "Familj"
-Directory: ./Familj
-Background-image: background.jpg
-Background-sound: background_sound.mp3
-Completion-sound: complete.mp3
-Fail-sound: oops.mp3
-Item 1: "Mamma", mamma.jpg, yipee.mp3
-Item 2: "Pappa", pappa.jpg, yipee.mp3
-Item 3: "Ruth", ruth.jpg, yipee.mp3
-Item 4: "Esther", esther.jpg, yipee.mp3
-
-
-Game:2
 Name: "Djur"
 Directory: ./Djur
 Background-image: background.jpg
@@ -27,7 +14,7 @@ Item 2: "Häst", hast.jpg, hast.mp3
 Item 3: "Gris", gris.jpg, gris.mp3
 Item 4: "Anka", anka.jpg, anka.mp3
 
-Game:3
+Game:2
 Name: "Djungel"
 Directory: ./Djungel
 Background-image: djungel.jpg
@@ -39,7 +26,7 @@ Item 2: "Elefant", elefant.jpg, elefant.mp3
 Item 3: "Lejon", lejon.jpg, lejon.mp3
 Item 4: "Orm", orm.jpg, orm.mp3
 
-Game:4
+Game:3
 Name: "Mat"
 Directory: ./Mat
 Background-image: kok.jpg
@@ -48,10 +35,10 @@ Completion-sound: hurra.mp3
 Fail-sound: nono.mp3
 Item 1: "Bulle", bulle.jpg, bulle.mp3
 Item 2: "Korv", korv.jpg, korv.mp3
-Item 3: "Mjolk", mjolk.jpg, mjolk.mp3
+Item 3: "Mjölk", mjolk.jpg, mjolk.mp3
 Item 4: "Pasta", pasta.jpg, pasta.mp3
 
-Game:5
+Game:4
 Name: "Frukt"
 Directory: ./Frukt
 Background-image: tradgard.jpg
@@ -62,3 +49,27 @@ Item 1: "Apelsin", apelsin.jpg, wow.mp3
 Item 2: "Äpple", apple.jpg, skratt.mp3
 Item 3: "Avokado", avokado.jpg, avokado.mp3
 Item 4: "Jordgubbe", jordgubbe.jpg, yummi.mp3
+
+Game:5
+Name: "Stad"
+Directory: ./Stad
+Background-image: stad.jpg
+Background-sound: stad.mp3
+Completion-sound: complete.mp3
+Fail-sound: fail.mp3
+Item 1: "Bil", bil.jpg, bil.mp3
+Item 2: "Buss", buss.jpg, buss.mp3
+Item 3: "Hus", hus.jpg, hus.mp3
+Item 4: "Båt", bat.jpg, bat.mp3
+
+Game:6
+Name: "Lek"
+Directory: ./Lek
+Background-image: lek.jpg
+Background-sound: lek.mp3
+Completion-sound: complete.mp3
+Fail-sound: boo.mp3
+Item 1: "Spade", spade.jpg, spade.mp3
+Item 2: "Hink", hink.jpg, hink.mp3
+Item 3: "Boll", boll.jpg, boll.mp3
+Item 4: "Gunga", gunga.jpg, gunga.mp3

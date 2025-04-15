@@ -1,0 +1,10 @@
+# Cursor config
+.cursor.config
+# Other common files to ignore
+node_modules/
+original/
+Familj/
+.DS_Store
+*.log 
+test*
+todo.txt

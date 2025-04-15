@@ -12,18 +12,33 @@ furnished to do so, subject to the following conditions:
 1. The above copyright notice and this permission notice shall be included in all
    copies or substantial portions of the Software.
 
-2. The Software may not be sold for profit or commercial gain. This includes,
-   but is not limited to:
-   - Selling the Software directly
-   - Selling modified versions of the Software
-   - Selling the Software as part of a larger product or service
-   - Selling the Software as a standalone application
+2. Commercial Use and Distribution Restrictions:
    
-   However, the Software may be used commercially, which includes:
-   - Using the Software in a business setting
-   - Using the Software to provide services
-   - Using the Software to create other products or services
-   - Using the Software as part of a larger business operation
+   A. Prohibited Activities (Not Allowed):
+      - Selling the Software directly (e.g., charging money to download or access the game)
+      - Selling modified versions of the Software (e.g., creating a paid version with additional features)
+      - Selling the Software as part of a larger product (e.g., including it in a paid app bundle)
+      - Selling the Software as a standalone application (e.g., selling it on an app store)
+      - Charging users to play or access the game
+      - Selling physical copies of the game (e.g., on CD or USB)
+   
+   B. Permitted Activities (Allowed):
+      - Using the Software in educational settings (e.g., schools, daycares)
+      - Using the Software in therapeutic settings (e.g., speech therapy, occupational therapy)
+      - Using the Software in business operations (e.g., as part of a learning center)
+      - Including the Software in free websites or applications
+      - Modifying the Software for personal or organizational use
+      - Distributing the Software for free
+      - Using the Software to provide free services
+
+3. The following third-party libraries are used in this project:
+   - Phaser.js (version 3.55.2) - MIT License
+     Copyright (c) 2013-2024 Richard Davey, Photon Storm Ltd.
+     https://github.com/photonstorm/phaser
+   
+   - Comic Neue font - Open Font License (OFL)
+     Copyright (c) 2014, Craig Rozynski
+     https://github.com/craigrozynski/comic-neue
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
