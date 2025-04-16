@@ -73,3 +73,16 @@ Item 1: "Spade", spade.jpg, spade.mp3
 Item 2: "Hink", hink.jpg, hink.mp3
 Item 3: "Boll", boll.jpg, boll.mp3
 Item 4: "Gunga", gunga.jpg, gunga.mp3
+
+
+Game:7
+Name: "Husdjur"
+Directory: ./Husdjur
+Background-image: background.jpg
+Background-sound: backgroundsound.mp3
+Completion-sound: complete.mp3
+Fail-sound: wrong.mp3
+Item 1: "Katt", katt.jpg, katt.mp3
+Item 2: "Hund", hund.jpg, hund.mp3
+Item 3: "Kanin", kanin.jpg, kanin.mp3
+Item 4: "Mus", mus.jpg, mus.mp3
