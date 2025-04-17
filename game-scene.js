@@ -609,27 +609,32 @@ class GameScene extends Phaser.Scene {
         let originalX;
         let originalY;
 
-        element.addEventListener('mousedown', (e) => {
+        // Shared event handlers
+        const handleStart = (e) => {
             isDragging = true;
-            startX = e.clientX;
-            startY = e.clientY;
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            startX = clientX;
+            startY = clientY;
             elementX = element.offsetLeft;
             elementY = element.offsetTop;
             originalX = elementX;
             originalY = elementY;
-        });
+        };
 
-        document.addEventListener('mousemove', (e) => {
+        const handleMove = (e) => {
             if (!isDragging) return;
             
-            const dx = e.clientX - startX;
-            const dy = e.clientY - startY;
+            const clientX = e.clientX || e.touches[0].clientX;
+            const clientY = e.clientY || e.touches[0].clientY;
+            const dx = clientX - startX;
+            const dy = clientY - startY;
             
             element.style.left = (elementX + dx) + 'px';
             element.style.top = (elementY + dy) + 'px';
-        });
+        };
 
-        document.addEventListener('mouseup', () => {
+        const handleEnd = () => {
             if (!isDragging) return;
             isDragging = false;
 
@@ -703,6 +708,16 @@ class GameScene extends Phaser.Scene {
                 element.style.left = originalX + 'px';
                 element.style.top = originalY + 'px';
             }
-        });
+        };
+
+        // Mouse event listeners
+        element.addEventListener('mousedown', handleStart);
+        document.addEventListener('mousemove', handleMove);
+        document.addEventListener('mouseup', handleEnd);
+
+        // Touch event listeners
+        element.addEventListener('touchstart', handleStart, { passive: false });
+        document.addEventListener('touchmove', handleMove, { passive: false });
+        document.addEventListener('touchend', handleEnd);
     }
 } 
