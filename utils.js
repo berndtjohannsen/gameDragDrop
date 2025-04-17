@@ -63,27 +63,3 @@ function playBackgroundMusic() {
     }
 }
 
-// Add orientation change handler for mobile devices
-window.addEventListener('orientationchange', function() {
-    // Wait for the orientation change to complete
-    setTimeout(() => {
-        if (gameInstance) {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
-            
-            // Resize the game
-            if (gameInstance.scale) {
-                gameInstance.scale.resize(width, height);
-            }
-            
-            // Update all game scenes
-            if (gameInstance.scene && gameInstance.scene.scenes) {
-                gameInstance.scene.scenes.forEach(scene => {
-                    if (scene instanceof GameScene && scene.handleResize) {
-                        scene.handleResize({ width, height });
-                    }
-                });
-            }
-        }
-    }, 300); // Longer delay for orientation changes
-}); 

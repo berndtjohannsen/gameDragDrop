@@ -269,7 +269,6 @@ canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
 }
 
 /* Landscape orientation for mobile */
-@media (max-width: 896px) and (orientation: landscape) {
     .fullscreen canvas {
         width: 100vw !important;
         height: 100vh !important;
@@ -360,7 +359,6 @@ canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
 }
 
 /* For landscape orientation */
-@media (orientation: landscape) and (max-height: 600px) {
     #game-selection {
         grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
         gap: 10px;
@@ -407,35 +405,3 @@ canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
 }
 
 /* Portrait mode overlay */
-#rotate-overlay {
-    display: none;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
-    z-index: 9999;
-}
-
-#rotate-overlay::after {
-    content: '📱';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 48px;
-    animation: rotatePhone 2s ease-in-out infinite;
-}
-
-@keyframes rotatePhone {
-    0% { transform: translate(-50%, -50%) rotate(0deg); }
-    50% { transform: translate(-50%, -50%) rotate(-90deg); }
-    100% { transform: translate(-50%, -50%) rotate(0deg); }
-}
-
-@media (orientation: portrait) {
-    #rotate-overlay {
-        display: block;
-    }
-} 
