@@ -375,13 +375,19 @@ class GameScene extends Phaser.Scene {
             
             // Create buttons container
             setTimeout(() => {
+                const gameContainer = document.getElementById('game-container');
+                const canvas = gameContainer.querySelector('canvas');
+                const canvasRect = canvas.getBoundingClientRect();
+                
                 const buttonsContainer = document.createElement('div');
+                // Position container relative to canvas
                 buttonsContainer.style.position = 'absolute';
-                buttonsContainer.style.left = `${this.width / 2}px`;
-                buttonsContainer.style.top = `${this.height * 0.7}px`;
-                buttonsContainer.style.transform = 'translateX(-50%)';
+                buttonsContainer.style.left = `${canvasRect.left + (canvasRect.width / 2)}px`;
+                buttonsContainer.style.top = `${canvasRect.top + (canvasRect.height * 0.85)}px`;
+                buttonsContainer.style.transform = 'translate(-50%, -50%)';
                 buttonsContainer.style.display = 'flex';
                 buttonsContainer.style.gap = '20px';
+                buttonsContainer.style.zIndex = '2000';
                 
                 // Create Play Again button
                 const restartBtn = document.createElement('div');
@@ -391,6 +397,7 @@ class GameScene extends Phaser.Scene {
                 restartBtn.style.position = 'relative';
                 restartBtn.style.padding = '8px 16px';
                 restartBtn.style.fontSize = '16px';
+                restartBtn.style.zIndex = '2000';
                 restartBtn.addEventListener('click', () => restartGame(this));
                 
                 // Create Return button
@@ -404,6 +411,7 @@ class GameScene extends Phaser.Scene {
                 returnBtn.style.position = 'relative';
                 returnBtn.style.padding = '8px 16px';
                 returnBtn.style.fontSize = '16px';
+                returnBtn.style.zIndex = '2000';
                 returnBtn.addEventListener('click', () => {
                     // Clean up the scene first
                     this.cleanup();
