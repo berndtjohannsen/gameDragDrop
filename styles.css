@@ -1,4 +1,4 @@
-body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f0f0; }
+body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f0f0; overflow: hidden; }
 #game-container { position: relative; width: 800px; height: 600px; overflow: hidden; }
 canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
 .name-box { 
