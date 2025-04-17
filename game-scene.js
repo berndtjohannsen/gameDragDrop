@@ -188,8 +188,8 @@ class GameScene extends Phaser.Scene {
         // Update name placement area for row layout
         const nameMinX = 50;
         const nameMaxX = this.width - 50;
-        const nameMinY = 400;  // Kept the same
-        const nameMaxY = 500;  // Kept the same
+        const nameMinY = 350;  // Changed from 400 to 350
+        const nameMaxY = 400;  // Changed from 500 to 400
         
         // Place pictures
         let placedPictures = [];

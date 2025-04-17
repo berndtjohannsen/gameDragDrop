@@ -404,4 +404,19 @@ canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
 .exit-btn:active {
     transform: scale(0.95) translateY(2px);
     box-shadow: 0 2px 0 #990000, 0 3px 4px rgba(0,0,0,0.3);
+}
+
+/* Portrait mode overlay */
+@media (orientation: portrait) {
+    #game-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        z-index: 9999;
+        pointer-events: none;
+    }
 } 
