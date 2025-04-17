@@ -142,16 +142,13 @@ class GameScene extends Phaser.Scene {
         if (this.gameConfig.backgroundSound) {
             console.log('Setting up background music:', this.gameConfig.backgroundSound);
             try {
-                // Always create a new background music instance
                 this.backgroundMusic = this.sound.add('background_sound', {
                     volume: 0.1,
                     loop: true
                 });
                 
-                // Update global reference
                 globalBackgroundMusic = this.backgroundMusic;
                 
-                // Add error handling for sound playing
                 this.backgroundMusic.on('play', () => {
                     console.log('Background music started playing');
                 });
@@ -160,7 +157,6 @@ class GameScene extends Phaser.Scene {
                     console.error('Error playing background music:', error);
                 });
                 
-                // Start playing
                 this.backgroundMusic.play();
             } catch (e) {
                 console.error("Error handling background music:", e);
@@ -179,40 +175,40 @@ class GameScene extends Phaser.Scene {
         // Shuffle the items array for random placement
         this.shuffleArray(items);
         
+        // Get the game container's actual dimensions
+        const gameContainer = document.getElementById('game-container');
+        const containerRect = gameContainer.getBoundingClientRect();
+        const scaleX = containerRect.width / this.width;
+        const scaleY = containerRect.height / this.height;
+        
         // Update picture placement area for row layout
-        const picMinX = 50;
-        const picMaxX = this.width - 50;
-        const picMinY = 100;  // Changed from 50 to 100 to move pictures down
-        const picMaxY = 250;  // Kept the same to maintain spacing
+        const picMinX = 50 * scaleX;
+        const picMaxX = (this.width - 50) * scaleX;
+        const picMinY = 100 * scaleY;
+        const picMaxY = 250 * scaleY;
         
         // Update name placement area for row layout
-        const nameMinX = 50;
-        const nameMaxX = this.width - 50;
-        const nameMinY = 350;  // Changed from 400 to 350
-        const nameMaxY = 400;  // Changed from 500 to 400
+        const nameMinX = 50 * scaleX;
+        const nameMaxX = (this.width - 50) * scaleX;
+        const nameMinY = 350 * scaleY;
+        const nameMaxY = 400 * scaleY;
         
         // Place pictures
         let placedPictures = [];
         items.forEach((item, index) => {
-            // Find a non-overlapping position for the picture
             let pos = this.getNonOverlappingPosition(
                 placedPictures, 
-                100, // picture width
-                100, // picture height
+                100 * scaleX, // picture width
+                100 * scaleY, // picture height
                 picMinX, 
                 picMaxX, 
                 picMinY, 
                 picMaxY
             );
             
-            // Create a container for the picture
             const container = this.add.container(pos.x, pos.y);
-            
-            // Create shadow and frame
             const shadow = this.add.rectangle(6, 6, 100, 100, 0x000000, 0.4);
             const frame = this.add.rectangle(0, 0, 100, 100, 0xFFFFFF, 1);
-            
-            // Create the picture
             const pic = this.add.image(0, 0, item.image)
                 .setDisplaySize(100, 100)
                 .setData('id', item.id);
@@ -220,14 +216,7 @@ class GameScene extends Phaser.Scene {
             container.add([shadow, frame, pic]);
             pic.container = container;
             this.pictures.push(pic);
-            
-            // Add to placed pictures array
-            placedPictures.push({ 
-                x: pos.x, 
-                y: pos.y, 
-                width: 100, 
-                height: 100
-            });
+            placedPictures.push({ x: pos.x, y: pos.y, width: 100, height: 100 });
             
             // Animate picture entry
             container.x = -200;
@@ -245,7 +234,6 @@ class GameScene extends Phaser.Scene {
                     container.y = pos.y;
                     container.angle = 0;
                     
-                    // Add bounce effect
                     this.tweens.add({
                         targets: container,
                         y: pos.y - 10,
@@ -264,43 +252,48 @@ class GameScene extends Phaser.Scene {
         // Place name boxes
         let placedNames = [];
         items.forEach((item, index) => {
-            // Find position for name box
             let pos = this.getNonOverlappingPosition(
                 placedNames, 
-                130, // name box width
-                50,  // name box height
+                130 * scaleX, // name box width
+                50 * scaleY,  // name box height
                 nameMinX,
                 nameMaxX,
                 nameMinY, 
                 nameMaxY
             );
             
-            // Create name box
             const nameElement = document.createElement('div');
             nameElement.className = 'name-box';
             nameElement.textContent = item.name;
             nameElement.dataset.id = item.id;
             
             // Position name box and store original position
-            const left = pos.x - 65; // half width
-            const top = pos.y - 25;  // half height
-            nameElement.style.left = left + 'px';
-            nameElement.style.top = top + 'px';
+            const left = pos.x - (65 * scaleX); // half width
+            const top = pos.y - (25 * scaleY);  // half height
+            
+            // Ensure the name box stays within the game container bounds
+            const maxLeft = containerRect.width - (130 * scaleX);
+            const maxTop = containerRect.height - (50 * scaleY);
+            
+            const finalLeft = Math.max(0, Math.min(left, maxLeft));
+            const finalTop = Math.max(0, Math.min(top, maxTop));
+            
+            nameElement.style.left = finalLeft + 'px';
+            nameElement.style.top = finalTop + 'px';
             
             // Store original position in the dataset
-            nameElement.dataset.originalX = left;
-            nameElement.dataset.originalY = top;
+            nameElement.dataset.originalX = finalLeft;
+            nameElement.dataset.originalY = finalTop;
             
             document.getElementById('game-container').appendChild(nameElement);
             this.setupDrag(nameElement);
             this.nameElements.push(nameElement);
             
-            // Add to placed names array
             placedNames.push({ 
                 x: pos.x, 
                 y: pos.y, 
-                width: 130,
-                height: 50
+                width: 130 * scaleX,
+                height: 50 * scaleY
             });
             
             // Animate entry
@@ -609,101 +602,111 @@ class GameScene extends Phaser.Scene {
         let originalX;
         let originalY;
 
-        // Shared event handlers
         const handleStart = (e) => {
+            if (element.matched) return; // Prevent dragging if already matched
             isDragging = true;
-            const clientX = e.clientX || e.touches[0].clientX;
-            const clientY = e.clientY || e.touches[0].clientY;
-            startX = clientX;
-            startY = clientY;
+            const touch = e.touches ? e.touches[0] : e;
+            startX = touch.clientX;
+            startY = touch.clientY;
             elementX = element.offsetLeft;
             elementY = element.offsetTop;
             originalX = elementX;
             originalY = elementY;
+            e.preventDefault();
         };
 
         const handleMove = (e) => {
             if (!isDragging) return;
+            const touch = e.touches ? e.touches[0] : e;
             
-            const clientX = e.clientX || e.touches[0].clientX;
-            const clientY = e.clientY || e.touches[0].clientY;
-            const dx = clientX - startX;
-            const dy = clientY - startY;
+            const dx = touch.clientX - startX;
+            const dy = touch.clientY - startY;
             
             element.style.left = (elementX + dx) + 'px';
             element.style.top = (elementY + dy) + 'px';
+            
+            e.preventDefault();
         };
 
         const handleEnd = () => {
             if (!isDragging) return;
             isDragging = false;
 
-            // Get the dropped element's position and dimensions
             const elementRect = element.getBoundingClientRect();
             const elementCenterX = elementRect.left + elementRect.width / 2;
             const elementCenterY = elementRect.top + elementRect.height / 2;
 
-            // Convert screen coordinates to game world coordinates
             const gameContainer = document.getElementById('game-container');
-            const containerRect = gameContainer.getBoundingClientRect();
-            const worldX = elementCenterX - containerRect.left;
-            const worldY = elementCenterY - containerRect.top;
+            const canvas = gameContainer.querySelector('canvas');
+            const canvasRect = canvas.getBoundingClientRect();
+            
+            // Track the closest matching picture
+            let closestPic = null;
+            let closestDistance = Infinity;
 
-            // Check for matches with pictures
-            let matched = false;
+            // First pass: find the closest matching picture
             this.pictures.forEach(pic => {
-                if (pic.matched) return; // Skip already matched pictures
+                if (pic.matched) return;
 
                 const picContainer = pic.container;
                 const picBounds = picContainer.getBounds();
                 
-                // Check if the name box is close enough to the picture
+                // Get picture's screen position
+                const picScreenX = (picBounds.x * canvasRect.width / this.width) + canvasRect.left;
+                const picScreenY = (picBounds.y * canvasRect.height / this.height) + canvasRect.top;
+                
+                // Calculate distance using screen coordinates
                 const distance = Math.sqrt(
-                    Math.pow(worldX - picBounds.centerX, 2) + 
-                    Math.pow(worldY - picBounds.centerY, 2)
+                    Math.pow(elementCenterX - picScreenX, 2) + 
+                    Math.pow(elementCenterY - picScreenY, 2)
                 );
 
-                if (distance < 100) { // Match threshold
-                    // Check if the name matches the picture
+                if (distance < 150 && distance < closestDistance) {
                     if (element.dataset.id === pic.getData('id')) {
-                        // Correct match
-                        matched = true;
-                        pic.matched = true;
-                        element.matched = true;
-                        this.matchedCount++;
-                        
-                        // Play the matching item's sound
-                        const itemSound = this.itemSounds[element.dataset.id];
-                        if (itemSound) {
-                            itemSound.play();
-                        }
-                        
-                        // Position under the picture (slightly overlapping)
-                        element.style.left = (picBounds.centerX - elementRect.width / 2) + 'px';
-                        element.style.top = (picBounds.centerY + 30) + 'px'; // Position below the picture
-                        
-                        // Add green background and make text white
-                        element.style.background = 'linear-gradient(to bottom, #4CAF50, #45a049)';
-                        element.style.color = 'white';
-                        element.style.border = '3px solid #2E7D32';
-                        element.style.boxShadow = '0 3px 0 #1B5E20, 0 4px 6px rgba(0,0,0,0.2)';
-                        
-                        // Check for game completion
-                        if (this.matchedCount === this.pictures.length) {
-                            this.handleGameCompletion();
-                        }
-                    } else {
-                        // Wrong match
-                        this.wrongSound.play();
-                        // Return to original position
-                        element.style.left = originalX + 'px';
-                        element.style.top = originalY + 'px';
+                        closestDistance = distance;
+                        closestPic = pic;
                     }
                 }
             });
 
-            // If no match was found or dropped not near any picture, play wrong sound and return to original position
-            if (!matched && !element.matched) {
+            // Handle the match result
+            if (closestPic) {
+                // Correct match found
+                closestPic.matched = true;
+                element.matched = true;
+                this.matchedCount++;
+                
+                const itemSound = this.itemSounds[element.dataset.id];
+                if (itemSound) {
+                    itemSound.play();
+                }
+
+                // Keep the text box exactly where it is when matched
+                const currentLeft = element.offsetLeft;
+                const currentTop = element.offsetTop;
+                
+                // Lock the element in place
+                element.style.position = 'absolute';
+                element.style.left = currentLeft + 'px';
+                element.style.top = currentTop + 'px';
+                element.style.zIndex = '1000';
+                element.style.transform = 'none';
+                element.style.transition = 'none';
+                
+                // Update visual style to show it's matched
+                element.style.background = 'linear-gradient(to bottom, #4CAF50, #45a049)';
+                element.style.color = 'white';
+                element.style.border = '3px solid #2E7D32';
+                element.style.boxShadow = '0 3px 0 #1B5E20, 0 4px 6px rgba(0,0,0,0.2)';
+                
+                // Force a browser reflow to ensure styles are applied
+                element.offsetHeight;
+                
+                if (this.matchedCount === this.pictures.length) {
+                    this.handleGameCompletion();
+                }
+            } else {
+                // No match found
                 this.wrongSound.play();
                 element.style.left = originalX + 'px';
                 element.style.top = originalY + 'px';

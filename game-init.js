@@ -136,8 +136,7 @@ async function startGame(gameDir) {
     const config = {
         type: Phaser.AUTO,
         scale: {
-            mode: Phaser.Scale.FIT,
-            autoCenter: Phaser.Scale.CENTER_BOTH,
+            mode: Phaser.Scale.NONE,
             parent: 'game-container',
             width: 800,
             height: 600
