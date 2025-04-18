@@ -2,9 +2,10 @@ class GameScene extends Phaser.Scene {
     constructor(gameDir, gameConfig) {
         super({ key: 'GameScene' });
         this.pictures = [];
-        this.nameElements = [];
+        this.nameBoxes = [];
         this.matchedCount = 0;
         this.restartBtn = null;
+        this.returnBtn = null;
         this.width = 800;
         this.height = 600;
         this.gameDir = gameDir;
@@ -118,6 +119,8 @@ class GameScene extends Phaser.Scene {
             this.load.image(item.name.toLowerCase(), `${this.gameDir}/pictures/${item.image}`);
             this.load.audio(`${item.name.toLowerCase()}_sound`, `${this.gameDir}/sounds/${item.sound}`);
         });
+
+        this.load.image('particle', 'assets/particle.png');
     }
 
     create() {
@@ -175,31 +178,29 @@ class GameScene extends Phaser.Scene {
         // Shuffle the items array for random placement
         this.shuffleArray(items);
         
-        // Get the game container's actual dimensions
-        const gameContainer = document.getElementById('game-container');
-        const containerRect = gameContainer.getBoundingClientRect();
-        const scaleX = containerRect.width / this.width;
-        const scaleY = containerRect.height / this.height;
+        // Calculate scale based on game dimensions
+        const scaleX = this.cameras.main.width / this.width;
+        const scaleY = this.cameras.main.height / this.height;
         
         // Update picture placement area for row layout
-        const picMinX = 50 * scaleX;
-        const picMaxX = (this.width - 50) * scaleX;
-        const picMinY = 100 * scaleY;
-        const picMaxY = 250 * scaleY;
+        const picMinX = 50;
+        const picMaxX = this.width - 50;
+        const picMinY = 100;
+        const picMaxY = 250;
         
         // Update name placement area for row layout
-        const nameMinX = 50 * scaleX;
-        const nameMaxX = (this.width - 50) * scaleX;
-        const nameMinY = 350 * scaleY;
-        const nameMaxY = 400 * scaleY;
+        const nameMinX = 50;
+        const nameMaxX = this.width - 50;
+        const nameMinY = 350;
+        const nameMaxY = 400;
         
         // Place pictures
         let placedPictures = [];
         items.forEach((item, index) => {
             let pos = this.getNonOverlappingPosition(
                 placedPictures, 
-                100 * scaleX, // picture width
-                100 * scaleY, // picture height
+                100, // picture width
+                100, // picture height
                 picMinX, 
                 picMaxX, 
                 picMinY, 
@@ -254,187 +255,348 @@ class GameScene extends Phaser.Scene {
         items.forEach((item, index) => {
             let pos = this.getNonOverlappingPosition(
                 placedNames, 
-                130 * scaleX, // name box width
-                50 * scaleY,  // name box height
+                110, // name box width
+                40,  // name box height
                 nameMinX,
                 nameMaxX,
                 nameMinY, 
                 nameMaxY
             );
             
-            const nameElement = document.createElement('div');
-            nameElement.className = 'name-box';
-            nameElement.textContent = item.name;
-            nameElement.dataset.id = item.id;
+            // Create a container for the name box
+            const container = this.add.container(pos.x, pos.y);
             
-            // Position name box and store original position
-            const left = pos.x - (65 * scaleX); // half width
-            const top = pos.y - (25 * scaleY);  // half height
-            
-            // Ensure the name box stays within the game container bounds
-            const maxLeft = containerRect.width - (130 * scaleX);
-            const maxTop = containerRect.height - (50 * scaleY);
-            
-            const finalLeft = Math.max(0, Math.min(left, maxLeft));
-            const finalTop = Math.max(0, Math.min(top, maxTop));
-            
-            nameElement.style.left = finalLeft + 'px';
-            nameElement.style.top = finalTop + 'px';
-            
-            // Store original position in the dataset
-            nameElement.dataset.originalX = finalLeft;
-            nameElement.dataset.originalY = finalTop;
-            
-            document.getElementById('game-container').appendChild(nameElement);
-            this.setupDrag(nameElement);
-            this.nameElements.push(nameElement);
-            
-            placedNames.push({ 
-                x: pos.x, 
-                y: pos.y, 
-                width: 130 * scaleX,
-                height: 50 * scaleY
-            });
-            
-            // Animate entry
-            nameElement.style.opacity = '0';
-            nameElement.style.transform = 'rotate(-180deg)';
-            
-            setTimeout(() => {
-                nameElement.style.opacity = '1';
-                nameElement.style.transition = 'transform 0.8s ease-out';
-                nameElement.style.transform = 'rotate(0deg)';
-            }, 200 + (index + items.length) * 200);
-        });
-    }
+            // Create the text first to measure its width
+            const text = this.add.text(0, 0, item.name, {
+                fontFamily: '"Comic Sans MS", "Marker Felt", "Arial Rounded MT Bold", sans-serif',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                color: '#FFFFFF',
+                padding: { x: 6, y: 4 }
+            }).setOrigin(0.5);
 
-    checkOverlap(obj1, obj2) {
-        const bounds1 = obj1.getBounds();
-        const bounds2 = obj2.getBounds();
-        return Phaser.Geom.Rectangle.Overlaps(bounds1, bounds2);
-    }
+            // Calculate box width based on text width plus padding
+            const boxWidth = text.width + 24; // Reduced padding (12px on each side)
+            const boxHeight = 40;  // Keep height fixed
 
-    handleMatch(droppedItem, targetItem) {
-        if (droppedItem.name === targetItem.name) {
-            // Correct match
-            droppedItem.matched = true;
-            targetItem.matched = true;
-            droppedItem.gameObject.setPosition(targetItem.target.x, targetItem.target.y);
-            droppedItem.gameObject.disableInteractive();
-            targetItem.sound.play();
+            // Create shadow to match the picture frames
+            const shadowGraphics = this.add.graphics();
+            shadowGraphics.fillStyle(0x000000, 0.4);
+            shadowGraphics.fillRoundedRect(-boxWidth/2 + 6, -20 + 6, boxWidth, boxHeight, 20);
             
-            this.matchedCount++;
+            // Create a graphics object for the background (bright blue)
+            const backgroundGraphics = this.add.graphics();
+            // Add white border first
+            backgroundGraphics.lineStyle(2, 0xFFFFFF);
+            backgroundGraphics.fillStyle(0x4A90E2, 1);
+            backgroundGraphics.fillRoundedRect(-boxWidth/2, -20, boxWidth, boxHeight, 20);
+            backgroundGraphics.strokeRoundedRect(-boxWidth/2, -20, boxWidth, boxHeight, 20);
             
-            // Check for game completion
-            if (this.matchedCount === this.items.length) {
-                this.completionSound.play();
-                this.time.delayedCall(500, () => {
-                    this.showCelebration();
-                });
-            }
-        } else {
-            // Wrong match
-            this.wrongSound.play();
-            droppedItem.gameObject.setPosition(droppedItem.gameObject.input.dragStartX, droppedItem.gameObject.input.dragStartY);
-        }
-    }
+            // Add all elements to container in the correct order
+            container.add([shadowGraphics, backgroundGraphics, text]);
+            
+            // Set up container properties
+            container.setSize(boxWidth, boxHeight);
+            container.setData('id', item.id);
+            container.setData('originalX', pos.x);
+            container.setData('originalY', pos.y);
+            container.setInteractive({ draggable: true });
 
-    handleGameCompletion() {
-        this.completionSound.play();
-        
-        setTimeout(() => {
-            // Bounce animation for pictures and names
-            this.pictures.forEach((pic, index) => {
-                if (pic.container) {
+            // Store the box dimensions for later use (like when matching)
+            container.setData('boxWidth', boxWidth);
+            container.setData('boxHeight', boxHeight);
+            
+            // Add hover effect
+            container.on('pointerover', () => {
+                if (!container.getData('matched')) {
                     this.tweens.add({
-                        targets: pic.container,
-                        y: pic.container.y - 20,
-                        angle: Phaser.Math.Between(-10, 10),
-                        duration: 300,
-                        yoyo: true,
-                        repeat: 2,
-                        delay: index * 100,
-                        ease: 'Bounce.Out'
+                        targets: container,
+                        scaleX: 1.05,
+                        scaleY: 1.05,
+                        duration: 100,
+                        ease: 'Back.easeOut'
                     });
                 }
             });
             
-            // Create confetti
-            const colors = ['#FF5252', '#FFD740', '#64FFDA', '#448AFF', '#B388FF', '#F48FB1'];
-            for (let i = 0; i < 150; i++) {
-                setTimeout(() => {
-                    const confetti = document.createElement('div');
-                    confetti.className = 'confetti';
-                    confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                    confetti.style.left = `${Math.random() * this.width}px`;
-                    document.getElementById('game-container').appendChild(confetti);
-                    
-                    setTimeout(() => confetti.parentNode?.removeChild(confetti), 5000);
-                }, Math.random() * 1000);
-            }
+            container.on('pointerout', () => {
+                if (!container.getData('matched')) {
+                    this.tweens.add({
+                        targets: container,
+                        scaleX: 1,
+                        scaleY: 1,
+                        duration: 100,
+                        ease: 'Back.easeIn'
+                    });
+                }
+            });
             
-            // Create buttons container
-            setTimeout(() => {
-                const gameContainer = document.getElementById('game-container');
-                const canvas = gameContainer.querySelector('canvas');
-                const canvasRect = canvas.getBoundingClientRect();
-                
-                const buttonsContainer = document.createElement('div');
-                // Position container relative to canvas
-                buttonsContainer.style.position = 'absolute';
-                buttonsContainer.style.left = `${canvasRect.left + (canvasRect.width / 2)}px`;
-                buttonsContainer.style.top = `${canvasRect.top + (canvasRect.height * 0.85)}px`;
-                buttonsContainer.style.transform = 'translate(-50%, -50%)';
-                buttonsContainer.style.display = 'flex';
-                buttonsContainer.style.gap = '20px';
-                buttonsContainer.style.zIndex = '2000';
-                
-                // Create Play Again button
-                const restartBtn = document.createElement('div');
-                restartBtn.className = 'play-again-btn';
-                restartBtn.textContent = 'Spela igen';
-                restartBtn.style.transform = 'rotate(-1deg)';
-                restartBtn.style.position = 'relative';
-                restartBtn.style.padding = '8px 16px';
-                restartBtn.style.fontSize = '16px';
-                restartBtn.style.zIndex = '2000';
-                restartBtn.addEventListener('click', () => restartGame(this));
-                
-                // Create Return button
-                const returnBtn = document.createElement('div');
-                returnBtn.className = 'play-again-btn';
-                returnBtn.textContent = 'Tillbaka';
-                returnBtn.style.transform = 'rotate(1deg)';
-                returnBtn.style.background = 'linear-gradient(to bottom, #FF6B6B, #FF4444)';
-                returnBtn.style.border = '3px solid #CC0000';
-                returnBtn.style.boxShadow = '0 3px 0 #990000, 0 4px 6px rgba(0,0,0,0.2)';
-                returnBtn.style.position = 'relative';
-                returnBtn.style.padding = '8px 16px';
-                returnBtn.style.fontSize = '16px';
-                returnBtn.style.zIndex = '2000';
-                returnBtn.addEventListener('click', () => {
-                    // Clean up the scene first
-                    this.cleanup();
-                    
-                    // Stop all sounds
-                    this.sound.stopAll();
-                    
-                    // Destroy the game instance
-                    if (gameInstance) {
-                        safeDestroyGame();
-                        gameInstance = null;
+            // Store the container
+            this.nameBoxes.push(container);
+            
+            // Set up drag events
+            this.setupPhaserDrag(container);
+            
+            placedNames.push({ 
+                x: pos.x, 
+                y: pos.y, 
+                width: 110,
+                height: 40
+            });
+            
+            // Animate entry
+            container.setAlpha(0);
+            container.angle = -180;
+            
+            this.tweens.add({
+                targets: container,
+                alpha: 1,
+                angle: 0,
+                duration: 800,
+                delay: 200 + (index + items.length) * 200,
+                ease: 'Back.easeOut'
+            });
+        });
+    }
+
+    setupPhaserDrag(container) {
+        container.on('dragstart', () => {
+            if (container.getData('matched')) return;
+            container.setDepth(1000);
+            
+            // Add "picking up" effect
+            this.tweens.add({
+                targets: container,
+                scaleX: 1.1,
+                scaleY: 1.1,
+                y: container.y - 10,
+                duration: 200,
+                ease: 'Back.easeOut'
+            });
+        });
+
+        container.on('drag', (pointer, dragX, dragY) => {
+            if (container.getData('matched')) return;
+            container.x = dragX;
+            container.y = dragY;
+        });
+
+        container.on('dragend', () => {
+            if (container.getData('matched')) return;
+            container.setDepth(0);
+            
+            // Reset scale and position if not matched
+            this.tweens.add({
+                targets: container,
+                scaleX: 1,
+                scaleY: 1,
+                duration: 200,
+                ease: 'Back.easeOut'
+            });
+
+            // Find the closest matching picture
+            let closestPic = null;
+            let closestDistance = Infinity;
+
+            this.pictures.forEach(pic => {
+                if (pic.matched) return;
+
+                const picContainer = pic.container;
+                const distance = Phaser.Math.Distance.Between(
+                    container.x,
+                    container.y,
+                    picContainer.x,
+                    picContainer.y
+                );
+
+                if (distance < 150 && distance < closestDistance) {
+                    if (container.getData('id') === pic.getData('id')) {
+                        closestDistance = distance;
+                        closestPic = pic;
                     }
-                    
-                    // Show splash screen
-                    document.getElementById('splash-screen').style.display = 'flex';
+                }
+            });
+
+            if (closestPic) {
+                // Correct match
+                closestPic.matched = true;
+                container.setData('matched', true);
+                this.matchedCount++;
+
+                // Play sound
+                const itemSound = this.itemSounds[container.getData('id')];
+                if (itemSound) {
+                    itemSound.play();
+                }
+
+                // Update visual style with a fun celebration effect
+                const background = container.list[1]; // The background graphics
+
+                // Celebration animation
+                this.tweens.add({
+                    targets: container,
+                    scaleX: [1.2, 1],
+                    scaleY: [1.2, 1],
+                    duration: 400,
+                    ease: 'Back.easeOut',
+                    onComplete: () => {
+                        // Update the matched state visuals with green color
+                        const boxWidth = container.getData('boxWidth');
+                        background.clear();
+                        background.lineStyle(2, 0xFFFFFF);
+                        background.fillStyle(0x4CAF50, 1);
+                        background.fillRoundedRect(-boxWidth/2, -20, boxWidth, 40, 20);
+                        background.strokeRoundedRect(-boxWidth/2, -20, boxWidth, 40, 20);
+                    }
                 });
-                
-                buttonsContainer.appendChild(restartBtn);
-                buttonsContainer.appendChild(returnBtn);
-                document.getElementById('game-container').appendChild(buttonsContainer);
-                this.restartBtn = buttonsContainer;
-            }, 1500);
-        }, 500);
+
+                // Lock position with a bouncy animation
+                this.tweens.add({
+                    targets: container,
+                    x: closestPic.container.x,
+                    y: closestPic.container.y + 75,
+                    duration: 500,
+                    ease: 'Back.easeOut'
+                });
+
+                if (this.matchedCount === this.pictures.length) {
+                    this.handleGameCompletion();
+                }
+            } else {
+                // No match - return to original position with bounce effect
+                this.wrongSound.play();
+                this.tweens.add({
+                    targets: container,
+                    x: container.getData('originalX'),
+                    y: container.getData('originalY'),
+                    duration: 500,
+                    ease: 'Bounce.easeOut'
+                });
+            }
+        });
+    }
+
+    handleGameCompletion() {
+        // Play completion sound
+        if (this.completionSound) {
+            this.completionSound.play();
+        }
+
+        // Create confetti
+        this.createConfetti();
+
+        // Create Play Again button container - positioned to the left and lower
+        const playAgainContainer = this.add.container(this.cameras.main.centerX - 80, this.cameras.main.centerY + 150);
+        
+        // Create shadow for Play Again button
+        const playShadow = this.add.graphics();
+        playShadow.fillStyle(0x000000, 0.4);
+        playShadow.fillRoundedRect(-70 + 6, -20 + 6, 140, 40, 20);
+        
+        // Create background for Play Again button - purple/pink color
+        const playBackground = this.add.graphics();
+        playBackground.lineStyle(2, 0xFFFFFF);
+        playBackground.fillStyle(0xFF69B4, 1); // Purple/pink color
+        playBackground.fillRoundedRect(-70, -20, 140, 40, 20);
+        playBackground.strokeRoundedRect(-70, -20, 140, 40, 20);
+        
+        // Create Play Again text
+        const playText = this.add.text(0, 0, 'Spela igen', {
+            fontFamily: '"Comic Sans MS", "Marker Felt", "Arial Rounded MT Bold", sans-serif',
+            fontSize: '20px',
+            fontWeight: 'bold',
+            color: '#FFFFFF'
+        }).setOrigin(0.5);
+        
+        // Add elements to Play Again container
+        playAgainContainer.add([playShadow, playBackground, playText]);
+        playAgainContainer.setSize(140, 40);
+        playAgainContainer.setInteractive({ useHandCursor: true });
+        
+        // Create Return button container - positioned to the right and lower
+        const returnContainer = this.add.container(this.cameras.main.centerX + 80, this.cameras.main.centerY + 150);
+        
+        // Create shadow for Return button
+        const returnShadow = this.add.graphics();
+        returnShadow.fillStyle(0x000000, 0.4);
+        returnShadow.fillRoundedRect(-60 + 6, -20 + 6, 120, 40, 20);
+        
+        // Create background for Return button - bright red color
+        const returnBackground = this.add.graphics();
+        returnBackground.lineStyle(2, 0xFFFFFF);
+        returnBackground.fillStyle(0xFF4040, 1); // Bright red color
+        returnBackground.fillRoundedRect(-60, -20, 120, 40, 20);
+        returnBackground.strokeRoundedRect(-60, -20, 120, 40, 20);
+        
+        // Create Return text
+        const returnText = this.add.text(0, 0, 'Tillbaka', {
+            fontFamily: '"Comic Sans MS", "Marker Felt", "Arial Rounded MT Bold", sans-serif',
+            fontSize: '20px',
+            fontWeight: 'bold',
+            color: '#FFFFFF'
+        }).setOrigin(0.5);
+        
+        // Add elements to Return container
+        returnContainer.add([returnShadow, returnBackground, returnText]);
+        returnContainer.setSize(120, 40);
+        returnContainer.setInteractive({ useHandCursor: true });
+        
+        // Add hover effects for Play Again
+        playAgainContainer.on('pointerover', () => {
+            this.tweens.add({
+                targets: playAgainContainer,
+                scaleX: 1.05,
+                scaleY: 1.05,
+                duration: 100,
+                ease: 'Back.easeOut'
+            });
+        });
+        
+        playAgainContainer.on('pointerout', () => {
+            this.tweens.add({
+                targets: playAgainContainer,
+                scaleX: 1,
+                scaleY: 1,
+                duration: 100,
+                ease: 'Back.easeIn'
+            });
+        });
+        
+        // Add hover effects for Return
+        returnContainer.on('pointerover', () => {
+            this.tweens.add({
+                targets: returnContainer,
+                scaleX: 1.05,
+                scaleY: 1.05,
+                duration: 100,
+                ease: 'Back.easeOut'
+            });
+        });
+        
+        returnContainer.on('pointerout', () => {
+            this.tweens.add({
+                targets: returnContainer,
+                scaleX: 1,
+                scaleY: 1,
+                duration: 100,
+                ease: 'Back.easeIn'
+            });
+        });
+        
+        // Add click handlers
+        playAgainContainer.on('pointerdown', () => {
+            this.cleanup();
+            this.scene.restart();
+        });
+        
+        returnContainer.on('pointerdown', () => {
+            this.cleanup();
+            window.location.href = 'index.html';
+        });
+        
+        // Store references for cleanup
+        this.restartBtn = playAgainContainer;
+        this.returnBtn = returnContainer;
     }
 
     cleanup() {
@@ -460,33 +622,31 @@ class GameScene extends Phaser.Scene {
             }
         }
 
-        // Remove all name elements
-        this.nameElements.forEach(element => {
-            if (element.parentNode) {
-                element.parentNode.removeChild(element);
-            }
+        // Destroy all game objects
+        this.nameBoxes.forEach(container => {
+            container.destroy();
         });
         
-        // Remove all pictures
         this.pictures.forEach(pic => {
-            if (pic.container && pic.container.parentNode) {
-                pic.container.parentNode.removeChild(pic.container);
+            if (pic.container) {
+                pic.container.destroy();
             }
         });
         
         // Reset arrays
-        this.nameElements = [];
+        this.nameBoxes = [];
         this.pictures = [];
         this.matchedCount = 0;
         
-        // Remove buttons container
-        if (this.restartBtn?.parentNode) {
-            this.restartBtn.parentNode.removeChild(this.restartBtn);
+        // Destroy Phaser buttons
+        if (this.restartBtn) {
+            this.restartBtn.destroy();
             this.restartBtn = null;
         }
-        
-        // Remove all confetti
-        document.querySelectorAll('.confetti').forEach(c => c.parentNode?.removeChild(c));
+        if (this.returnBtn) {
+            this.returnBtn.destroy();
+            this.returnBtn = null;
+        }
         
         // Clean up sounds safely
         if (this.backgroundMusic) {
@@ -559,15 +719,6 @@ class GameScene extends Phaser.Scene {
                 }
             });
         }
-        
-        // Remove only game-specific elements, preserving the canvas
-        const gameContainer = document.getElementById('game-container');
-        const elementsToRemove = gameContainer.querySelectorAll('.name-box, .confetti, .play-again-btn');
-        elementsToRemove.forEach(element => {
-            if (element.parentNode) {
-                element.parentNode.removeChild(element);
-            }
-        });
 
         this.isTransitioning = false;
     }
@@ -601,134 +752,42 @@ class GameScene extends Phaser.Scene {
         };
     }
 
-    setupDrag(element) {
-        let isDragging = false;
-        let startX;
-        let startY;
-        let elementX;
-        let elementY;
-        let originalX;
-        let originalY;
-
-        const handleStart = (e) => {
-            if (element.matched) return; // Prevent dragging if already matched
-            isDragging = true;
-            const touch = e.touches ? e.touches[0] : e;
-            startX = touch.clientX;
-            startY = touch.clientY;
-            elementX = element.offsetLeft;
-            elementY = element.offsetTop;
-            originalX = elementX;
-            originalY = elementY;
-            e.preventDefault();
-        };
-
-        const handleMove = (e) => {
-            if (!isDragging) return;
-            const touch = e.touches ? e.touches[0] : e;
-            
-            const dx = touch.clientX - startX;
-            const dy = touch.clientY - startY;
-            
-            element.style.left = (elementX + dx) + 'px';
-            element.style.top = (elementY + dy) + 'px';
-            
-            e.preventDefault();
-        };
-
-        const handleEnd = () => {
-            if (!isDragging) return;
-            isDragging = false;
-
-            const elementRect = element.getBoundingClientRect();
-            const elementCenterX = elementRect.left + elementRect.width / 2;
-            const elementCenterY = elementRect.top + elementRect.height / 2;
-
-            const gameContainer = document.getElementById('game-container');
-            const canvas = gameContainer.querySelector('canvas');
-            const canvasRect = canvas.getBoundingClientRect();
-            
-            // Track the closest matching picture
-            let closestPic = null;
-            let closestDistance = Infinity;
-
-            // First pass: find the closest matching picture
-            this.pictures.forEach(pic => {
-                if (pic.matched) return;
-
-                const picContainer = pic.container;
-                const picBounds = picContainer.getBounds();
-                
-                // Get picture's screen position
-                const picScreenX = (picBounds.x * canvasRect.width / this.width) + canvasRect.left;
-                const picScreenY = (picBounds.y * canvasRect.height / this.height) + canvasRect.top;
-                
-                // Calculate distance using screen coordinates
-                const distance = Math.sqrt(
-                    Math.pow(elementCenterX - picScreenX, 2) + 
-                    Math.pow(elementCenterY - picScreenY, 2)
-                );
-
-                if (distance < 150 && distance < closestDistance) {
-                    if (element.dataset.id === pic.getData('id')) {
-                        closestDistance = distance;
-                        closestPic = pic;
-                    }
-                }
+    createConfetti() {
+        // Create a particle emitter for confetti
+        const particles = this.add.particles('particle');
+        
+        const emitter = particles.createEmitter({
+            x: { min: 0, max: this.cameras.main.width },
+            y: -10,
+            lifespan: 4000,
+            speedY: { min: 200, max: 400 },
+            speedX: { min: -100, max: 100 },
+            angle: { min: 0, max: 360 },
+            rotate: { min: 0, max: 360 },
+            scale: { start: 1, end: 0.2 }, // Larger particles
+            quantity: 4, // More particles per emission
+            frequency: 40, // Slightly faster emission
+            tint: [ // More vibrant colors
+                0xFF1744, // Bright red
+                0xFFEA00, // Bright yellow
+                0x00E676, // Bright green
+                0x2979FF, // Bright blue
+                0xAA00FF, // Bright purple
+                0xFF80AB, // Bright pink
+                0xFFFF00, // Pure yellow
+                0x76FF03  // Lime
+            ],
+            alpha: { start: 1, end: 0 },
+            blendMode: 'ADD'
+        });
+        
+        // Stop emitting after 3 seconds
+        this.time.delayedCall(3000, () => {
+            emitter.stop();
+            // Destroy the particle system after all particles have died (4 seconds)
+            this.time.delayedCall(4000, () => {
+                particles.destroy();
             });
-
-            // Handle the match result
-            if (closestPic) {
-                // Correct match found
-                closestPic.matched = true;
-                element.matched = true;
-                this.matchedCount++;
-                
-                const itemSound = this.itemSounds[element.dataset.id];
-                if (itemSound) {
-                    itemSound.play();
-                }
-
-                // Keep the text box exactly where it is when matched
-                const currentLeft = element.offsetLeft;
-                const currentTop = element.offsetTop;
-                
-                // Lock the element in place
-                element.style.position = 'absolute';
-                element.style.left = currentLeft + 'px';
-                element.style.top = currentTop + 'px';
-                element.style.zIndex = '1000';
-                element.style.transform = 'none';
-                element.style.transition = 'none';
-                
-                // Update visual style to show it's matched
-                element.style.background = 'linear-gradient(to bottom, #4CAF50, #45a049)';
-                element.style.color = 'white';
-                element.style.border = '3px solid #2E7D32';
-                element.style.boxShadow = '0 3px 0 #1B5E20, 0 4px 6px rgba(0,0,0,0.2)';
-                
-                // Force a browser reflow to ensure styles are applied
-                element.offsetHeight;
-                
-                if (this.matchedCount === this.pictures.length) {
-                    this.handleGameCompletion();
-                }
-            } else {
-                // No match found
-                this.wrongSound.play();
-                element.style.left = originalX + 'px';
-                element.style.top = originalY + 'px';
-            }
-        };
-
-        // Mouse event listeners
-        element.addEventListener('mousedown', handleStart);
-        document.addEventListener('mousemove', handleMove);
-        document.addEventListener('mouseup', handleEnd);
-
-        // Touch event listeners
-        element.addEventListener('touchstart', handleStart, { passive: false });
-        document.addEventListener('touchmove', handleMove, { passive: false });
-        document.addEventListener('touchend', handleEnd);
+        });
     }
 } 

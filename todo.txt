@@ -4,3 +4,4 @@ Things to maybe do sometimes...
 - exit button from game
 - dynamic upload of pictures/sounds
 - load games from github (url)
+- gör alla texter kofigurerbara (spela igen/tillbaka/Välj spel)
