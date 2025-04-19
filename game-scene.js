@@ -132,7 +132,7 @@ class GameScene extends Phaser.Scene {
             .setDisplaySize(this.width, this.height);
         
         // Add fullscreen button as a Phaser object
-        const fullscreenBtn = this.add.container(this.width - 30, 30);
+        const fullscreenBtn = this.add.container(this.width - 40, 40);
         
         // Create button background
         const btnBg = this.add.graphics();
@@ -142,7 +142,7 @@ class GameScene extends Phaser.Scene {
         btnBg.strokeRoundedRect(-20, -20, 40, 40, 10);
         
         // Create button text
-        const btnText = this.add.text(0, 0, '⛶', {
+        const btnText = this.add.text(0, 0, '⤢', {  // Default to non-fullscreen icon
             fontFamily: 'Arial',
             fontSize: '24px',
             color: '#FFFFFF'
@@ -155,43 +155,87 @@ class GameScene extends Phaser.Scene {
         fullscreenBtn.setSize(40, 40);
         fullscreenBtn.setInteractive({ useHandCursor: true });
         
-        // Add hover effect
-        fullscreenBtn.on('pointerover', () => {
+        // Function to update button appearance
+        const updateButtonAppearance = (isFullscreen) => {
+            btnText.setText(isFullscreen ? '⛶' : '⤢');
             btnBg.clear();
-            btnBg.fillStyle(0x000000, 0.7);
+            btnBg.fillStyle(btnBg.isHovered ? 0x000000 : 0x000000, btnBg.isHovered ? 0.7 : 0.5);
             btnBg.fillRoundedRect(-20, -20, 40, 40, 10);
             btnBg.lineStyle(2, 0xFFFFFF);
             btnBg.strokeRoundedRect(-20, -20, 40, 40, 10);
+        };
+        
+        // Check initial fullscreen state and update button
+        const isFullscreen = document.fullscreenElement || 
+                           document.webkitFullscreenElement || 
+                           document.msFullscreenElement;
+        updateButtonAppearance(isFullscreen);
+        
+        // Add hover effect
+        fullscreenBtn.on('pointerover', () => {
+            btnBg.isHovered = true;
+            updateButtonAppearance(document.fullscreenElement || 
+                                 document.webkitFullscreenElement || 
+                                 document.msFullscreenElement);
         });
         
         fullscreenBtn.on('pointerout', () => {
-            btnBg.clear();
-            btnBg.fillStyle(0x000000, 0.5);
-            btnBg.fillRoundedRect(-20, -20, 40, 40, 10);
-            btnBg.lineStyle(2, 0xFFFFFF);
-            btnBg.strokeRoundedRect(-20, -20, 40, 40, 10);
+            btnBg.isHovered = false;
+            updateButtonAppearance(document.fullscreenElement || 
+                                 document.webkitFullscreenElement || 
+                                 document.msFullscreenElement);
         });
         
         // Add click handler
         fullscreenBtn.on('pointerdown', async () => {
             try {
-                const container = document.getElementById('game-container');
-                if (container) {
-                    if (container.requestFullscreen) {
-                        await container.requestFullscreen();
-                    } else if (container.webkitRequestFullscreen) {
-                        await container.webkitRequestFullscreen();
-                    } else if (container.msRequestFullscreen) {
-                        await container.msRequestFullscreen();
+                const isFullscreen = document.fullscreenElement || 
+                                   document.webkitFullscreenElement || 
+                                   document.msFullscreenElement;
+                
+                if (!isFullscreen) {
+                    // Enter fullscreen on the document element
+                    if (document.documentElement.requestFullscreen) {
+                        await document.documentElement.requestFullscreen();
+                    } else if (document.documentElement.webkitRequestFullscreen) {
+                        await document.documentElement.webkitRequestFullscreen();
+                    } else if (document.documentElement.msRequestFullscreen) {
+                        await document.documentElement.msRequestFullscreen();
+                    }
+                } else {
+                    // Exit fullscreen
+                    if (document.exitFullscreen) {
+                        await document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        await document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        await document.msExitFullscreen();
                     }
                 }
+                
+                // Update button appearance after fullscreen change
+                updateButtonAppearance(!isFullscreen);
             } catch (error) {
-                console.warn('Failed to enter fullscreen:', error);
+                console.warn('Failed to toggle fullscreen:', error);
             }
         });
         
-        // Store reference for cleanup
+        // Add fullscreen change event listeners
+        const fullscreenChangeHandler = () => {
+            const isFullscreen = document.fullscreenElement || 
+                               document.webkitFullscreenElement || 
+                               document.msFullscreenElement;
+            updateButtonAppearance(isFullscreen);
+        };
+        
+        document.addEventListener('fullscreenchange', fullscreenChangeHandler);
+        document.addEventListener('webkitfullscreenchange', fullscreenChangeHandler);
+        document.addEventListener('mozfullscreenchange', fullscreenChangeHandler);
+        document.addEventListener('MSFullscreenChange', fullscreenChangeHandler);
+        
+        // Store references for cleanup
         this.fullscreenBtn = fullscreenBtn;
+        this.fullscreenChangeHandler = fullscreenChangeHandler;
         
         // Add sounds
         this.wrongSound = this.sound.add('wrong');
@@ -655,8 +699,8 @@ class GameScene extends Phaser.Scene {
             this.cleanup();
             
             // Show splash screen and game selection
-            document.getElementById('splash-screen').style.display = 'flex';
-            document.getElementById('game-selection').style.display = 'flex';
+            const splashScreen = document.getElementById('splash-screen');
+            splashScreen.style.display = 'flex';
             
             // Remove the canvas
             const canvas = document.querySelector('canvas');
@@ -798,6 +842,15 @@ class GameScene extends Phaser.Scene {
         if (this.fullscreenBtn) {
             this.fullscreenBtn.destroy();
             this.fullscreenBtn = null;
+        }
+
+        // Remove fullscreen event listeners
+        if (this.fullscreenChangeHandler) {
+            document.removeEventListener('fullscreenchange', this.fullscreenChangeHandler);
+            document.removeEventListener('webkitfullscreenchange', this.fullscreenChangeHandler);
+            document.removeEventListener('mozfullscreenchange', this.fullscreenChangeHandler);
+            document.removeEventListener('MSFullscreenChange', this.fullscreenChangeHandler);
+            this.fullscreenChangeHandler = null;
         }
 
         this.isTransitioning = false;

@@ -126,7 +126,8 @@ async function startGame(gameDir) {
     }
     
     // Hide the splash screen
-    document.getElementById('splash-screen').style.display = 'none';
+    const splashScreen = document.getElementById('splash-screen');
+    splashScreen.style.display = 'none';
     
     // Show the game container
     const gameContainer = document.getElementById('game-container');
@@ -141,7 +142,7 @@ async function startGame(gameDir) {
             width: 800,
             height: 600,
             autoCenter: Phaser.Scale.CENTER_BOTH,
-            fullscreenTarget: 'game-container'
+            fullscreenTarget: document.documentElement
         },
         parent: 'game-container',
         scene: new GameScene(gameDir, gameConfig),
@@ -152,25 +153,6 @@ async function startGame(gameDir) {
     
     // Create the game
     gameInstance = new Phaser.Game(config);
-
-    // Update button when fullscreen changes
-    document.addEventListener('fullscreenchange', updateFullscreenButton);
-    document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
-    document.addEventListener('mozfullscreenchange', updateFullscreenButton);
-    document.addEventListener('MSFullscreenChange', updateFullscreenButton);
-
-    function updateFullscreenButton() {
-        const isFullscreen = document.fullscreenElement || 
-                           document.webkitFullscreenElement || 
-                           document.mozFullScreenElement || 
-                           document.msFullscreenElement;
-        
-        const fullscreenButton = document.querySelector('.fullscreen-button');
-        if (fullscreenButton) {
-            fullscreenButton.innerHTML = isFullscreen ? '⛶' : '⛶';
-            fullscreenButton.title = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
-        }
-    }
 }
 
 // Add WebFont loader
@@ -207,7 +189,8 @@ function initGame(gameDir) {
         scene: [],
         scale: {
             mode: Phaser.Scale.FIT,
-            autoCenter: Phaser.Scale.CENTER_BOTH
+            autoCenter: Phaser.Scale.CENTER_BOTH,
+            fullscreenTarget: document.documentElement
         }
     };
 

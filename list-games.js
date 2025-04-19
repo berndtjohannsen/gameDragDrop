@@ -74,8 +74,12 @@ async function initializeGameSelection() {
         
         // Add click event listener
         button.addEventListener('click', function() {
+            // Start the game without changing fullscreen state
             const gameDir = this.dataset.game;
-            // Start the game directly without fullscreen
+            const container = document.getElementById('game-container');
+            
+            // Start the game while maintaining the container's state
+            container.style.transition = 'none';  // Prevent transition effects
             startGame(gameDir);
         });
         

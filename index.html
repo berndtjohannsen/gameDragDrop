@@ -17,7 +17,7 @@
     <div id="game-container">
         <div id="splash-screen">
             <div id="splash-title">Välj spel</div>
-            <button id="fullscreen-btn" style="position: absolute; top: 10px; right: 10px; z-index: 1000; font-size: 24px; padding: 5px 10px; background-color: rgba(0, 0, 0, 0.5); color: white; border: 2px solid white; border-radius: 5px; cursor: pointer;">⛶</button>
+            <button id="fullscreen-btn" style="position: absolute; top: 10px; right: 10px; z-index: 1000; font-size: 24px; padding: 5px 10px; background-color: rgba(0, 0, 0, 0.5); color: white; border: 2px solid white; border-radius: 5px; cursor: pointer;">⤢</button>
             <div id="game-selection">
                 <!-- Game buttons will be added here dynamically -->
             </div>
@@ -43,23 +43,51 @@
                 fullscreenBtn.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
             };
             
+            // Update button icon based on fullscreen state
+            function updateFullscreenButton() {
+                const isFullscreen = document.fullscreenElement || 
+                                   document.webkitFullscreenElement || 
+                                   document.msFullscreenElement;
+                fullscreenBtn.textContent = isFullscreen ? '⛶' : '⤢';
+                fullscreenBtn.title = isFullscreen ? 'Avsluta fullskärm' : 'Fullskärm';
+            }
+            
             // Add click handler
             fullscreenBtn.onclick = async () => {
                 try {
-                    const container = document.getElementById('game-container');
-                    if (container) {
-                        if (container.requestFullscreen) {
-                            await container.requestFullscreen();
-                        } else if (container.webkitRequestFullscreen) {
-                            await container.webkitRequestFullscreen();
-                        } else if (container.msRequestFullscreen) {
-                            await container.msRequestFullscreen();
+                    const isFullscreen = document.fullscreenElement || 
+                                       document.webkitFullscreenElement || 
+                                       document.msFullscreenElement;
+                    
+                    if (!isFullscreen) {
+                        // Enter fullscreen on the document element
+                        if (document.documentElement.requestFullscreen) {
+                            await document.documentElement.requestFullscreen();
+                        } else if (document.documentElement.webkitRequestFullscreen) {
+                            await document.documentElement.webkitRequestFullscreen();
+                        } else if (document.documentElement.msRequestFullscreen) {
+                            await document.documentElement.msRequestFullscreen();
+                        }
+                    } else {
+                        // Exit fullscreen
+                        if (document.exitFullscreen) {
+                            await document.exitFullscreen();
+                        } else if (document.webkitExitFullscreen) {
+                            await document.webkitExitFullscreen();
+                        } else if (document.msExitFullscreen) {
+                            await document.msExitFullscreen();
                         }
                     }
                 } catch (error) {
-                    console.warn('Failed to enter fullscreen:', error);
+                    console.warn('Failed to toggle fullscreen:', error);
                 }
             };
+
+            // Add fullscreen change event listeners
+            document.addEventListener('fullscreenchange', updateFullscreenButton);
+            document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+            document.addEventListener('mozfullscreenchange', updateFullscreenButton);
+            document.addEventListener('MSFullscreenChange', updateFullscreenButton);
 
             // Initialize game selection
             initializeGameSelection();
