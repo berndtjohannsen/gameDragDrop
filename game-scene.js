@@ -131,6 +131,68 @@ class GameScene extends Phaser.Scene {
         this.add.image(this.width / 2, this.height / 2, 'background')
             .setDisplaySize(this.width, this.height);
         
+        // Add fullscreen button as a Phaser object
+        const fullscreenBtn = this.add.container(this.width - 30, 30);
+        
+        // Create button background
+        const btnBg = this.add.graphics();
+        btnBg.fillStyle(0x000000, 0.5);
+        btnBg.fillRoundedRect(-20, -20, 40, 40, 10);
+        btnBg.lineStyle(2, 0xFFFFFF);
+        btnBg.strokeRoundedRect(-20, -20, 40, 40, 10);
+        
+        // Create button text
+        const btnText = this.add.text(0, 0, '⛶', {
+            fontFamily: 'Arial',
+            fontSize: '24px',
+            color: '#FFFFFF'
+        }).setOrigin(0.5);
+        
+        // Add elements to container
+        fullscreenBtn.add([btnBg, btnText]);
+        
+        // Make interactive
+        fullscreenBtn.setSize(40, 40);
+        fullscreenBtn.setInteractive({ useHandCursor: true });
+        
+        // Add hover effect
+        fullscreenBtn.on('pointerover', () => {
+            btnBg.clear();
+            btnBg.fillStyle(0x000000, 0.7);
+            btnBg.fillRoundedRect(-20, -20, 40, 40, 10);
+            btnBg.lineStyle(2, 0xFFFFFF);
+            btnBg.strokeRoundedRect(-20, -20, 40, 40, 10);
+        });
+        
+        fullscreenBtn.on('pointerout', () => {
+            btnBg.clear();
+            btnBg.fillStyle(0x000000, 0.5);
+            btnBg.fillRoundedRect(-20, -20, 40, 40, 10);
+            btnBg.lineStyle(2, 0xFFFFFF);
+            btnBg.strokeRoundedRect(-20, -20, 40, 40, 10);
+        });
+        
+        // Add click handler
+        fullscreenBtn.on('pointerdown', async () => {
+            try {
+                const container = document.getElementById('game-container');
+                if (container) {
+                    if (container.requestFullscreen) {
+                        await container.requestFullscreen();
+                    } else if (container.webkitRequestFullscreen) {
+                        await container.webkitRequestFullscreen();
+                    } else if (container.msRequestFullscreen) {
+                        await container.msRequestFullscreen();
+                    }
+                }
+            } catch (error) {
+                console.warn('Failed to enter fullscreen:', error);
+            }
+        });
+        
+        // Store reference for cleanup
+        this.fullscreenBtn = fullscreenBtn;
+        
         // Add sounds
         this.wrongSound = this.sound.add('wrong');
         this.completionSound = this.sound.add('completion_sound');
@@ -591,7 +653,19 @@ class GameScene extends Phaser.Scene {
         
         returnContainer.on('pointerdown', () => {
             this.cleanup();
-            window.location.href = 'index.html';
+            
+            // Show splash screen and game selection
+            document.getElementById('splash-screen').style.display = 'flex';
+            document.getElementById('game-selection').style.display = 'flex';
+            
+            // Remove the canvas
+            const canvas = document.querySelector('canvas');
+            if (canvas) {
+                canvas.remove();
+            }
+            
+            // Reinitialize game selection
+            initializeGameSelection();
         });
         
         // Store references for cleanup
@@ -718,6 +792,12 @@ class GameScene extends Phaser.Scene {
                     console.warn("Error cleaning up item sound:", e);
                 }
             });
+        }
+
+        // Remove fullscreen button
+        if (this.fullscreenBtn) {
+            this.fullscreenBtn.destroy();
+            this.fullscreenBtn = null;
         }
 
         this.isTransitioning = false;

@@ -136,10 +136,12 @@ async function startGame(gameDir) {
     const config = {
         type: Phaser.AUTO,
         scale: {
-            mode: Phaser.Scale.NONE,
+            mode: Phaser.Scale.FIT,
             parent: 'game-container',
             width: 800,
-            height: 600
+            height: 600,
+            autoCenter: Phaser.Scale.CENTER_BOTH,
+            fullscreenTarget: 'game-container'
         },
         parent: 'game-container',
         scene: new GameScene(gameDir, gameConfig),
@@ -150,6 +152,25 @@ async function startGame(gameDir) {
     
     // Create the game
     gameInstance = new Phaser.Game(config);
+
+    // Update button when fullscreen changes
+    document.addEventListener('fullscreenchange', updateFullscreenButton);
+    document.addEventListener('webkitfullscreenchange', updateFullscreenButton);
+    document.addEventListener('mozfullscreenchange', updateFullscreenButton);
+    document.addEventListener('MSFullscreenChange', updateFullscreenButton);
+
+    function updateFullscreenButton() {
+        const isFullscreen = document.fullscreenElement || 
+                           document.webkitFullscreenElement || 
+                           document.mozFullScreenElement || 
+                           document.msFullscreenElement;
+        
+        const fullscreenButton = document.querySelector('.fullscreen-button');
+        if (fullscreenButton) {
+            fullscreenButton.innerHTML = isFullscreen ? '⛶' : '⛶';
+            fullscreenButton.title = isFullscreen ? 'Exit Fullscreen' : 'Fullscreen';
+        }
+    }
 }
 
 // Add WebFont loader
@@ -166,4 +187,40 @@ WebFontConfig = {
     wf.async = 'true';
     var s = document.getElementsByTagName('script')[0];
     s.parentNode.insertBefore(wf, s);
-})(); 
+})();
+
+function initGame(gameDir) {
+    // Clean up any existing game instance
+    if (gameInstance) {
+        safeDestroyGame();
+    }
+
+    // Hide splash screen
+    document.getElementById('splash-screen').style.display = 'none';
+
+    // Create new game instance
+    const config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        parent: 'game-container',
+        scene: [],
+        scale: {
+            mode: Phaser.Scale.FIT,
+            autoCenter: Phaser.Scale.CENTER_BOTH
+        }
+    };
+
+    gameInstance = new Phaser.Game(config);
+
+    // Load and parse game configuration
+    fetch('games.txt')
+        .then(response => response.text())
+        .then(configText => {
+            const scene = new GameScene(gameDir, parseConfig(configText, gameDir));
+            gameInstance.scene.add('GameScene', scene, true);
+        })
+        .catch(error => {
+            console.error('Error loading game configuration:', error);
+        });
+} 

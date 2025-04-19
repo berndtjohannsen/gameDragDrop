@@ -75,10 +75,23 @@ async function initializeGameSelection() {
         // Add click event listener
         button.addEventListener('click', function() {
             const gameDir = this.dataset.game;
+            // Start the game directly without fullscreen
             startGame(gameDir);
         });
         
         // Add button to container
         gameSelection.appendChild(button);
     });
+}
+
+// Handle fullscreen changes
+function handleFullscreenChange() {
+    const isFullscreen = document.fullscreenElement || 
+                        document.webkitFullscreenElement || 
+                        document.mozFullScreenElement || 
+                        document.msFullscreenElement;
+    
+    if (!isFullscreen) {
+        console.log('Exited fullscreen mode');
+    }
 } 

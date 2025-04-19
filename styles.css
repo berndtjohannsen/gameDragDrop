@@ -1,30 +1,52 @@
-body { margin: 0; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f0f0f0; overflow: hidden; }
-#game-container { position: relative; width: 800px; height: 600px; overflow: hidden; }
-canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
-.name-box { 
+body {
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f0f0f0;
+    overflow: hidden;
+}
+
+#game-container {
+    position: relative;
+    width: 800px;
+    height: 600px;
+    overflow: hidden;
+}
+
+canvas {
+    border: 2px solid #333;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Name box styles */
+.name-box {
     position: absolute;
     background-color: #4a90e2;
     color: white;
-    padding: calc(0.75vh + 0.75vw);
-    border-radius: calc(1vh + 1vw);
-    font-family: 'Comic Neue', cursive;
-    font-size: calc(2vh + 1vw);
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-family: 'Comic Sans MS', 'Marker Felt', 'Arial Rounded MT Bold', sans-serif;
+    font-size: 20px;
     font-weight: bold;
-    box-shadow: 0 calc(0.5vh + 0.5vw) calc(1vh + 1vw) rgba(0, 0, 0, 0.2), 
-                calc(0.75vh + 0.75vw) calc(0.75vh + 0.75vw) 0 rgba(0, 0, 0, 0.4);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 3px 3px 0 rgba(0, 0, 0, 0.4);
     cursor: grab;
     user-select: none;
     z-index: 10;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     transform-origin: center center;
     width: auto;
-    min-width: calc(10vh + 5vw);
     text-align: center;
     will-change: transform, left, top;
-    border: calc(0.25vh + 0.25vw) solid white;
+    border: 2px solid white;
     display: inline-block;
     white-space: nowrap;
     box-sizing: border-box;
+    min-width: 0;
+    max-width: none;
 }
 
 .name-box:active {
@@ -38,6 +60,7 @@ canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
     cursor: default;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 3px 3px 0 rgba(0, 0, 0, 0.4);
 }
+
 /* Celebration effects */
 .confetti {
     position: absolute;
@@ -47,22 +70,34 @@ canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
     animation: confetti-fall 4s ease-out forwards;
     z-index: 50;
 }
+
 @keyframes confetti-fall {
-    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(600px) rotate(360deg); opacity: 0; }
+    0% {
+        transform: translateY(-10px) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(600px) rotate(360deg);
+        opacity: 0;
+    }
 }
 
-/* Fullscreen confetti animation */
 @keyframes confetti-fall-fullscreen {
-    0% { transform: translateY(-10px) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+    0% {
+        transform: translateY(-10px) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(100vh) rotate(360deg);
+        opacity: 0;
+    }
 }
 
-/* Apply fullscreen animation when in fullscreen mode */
 .fullscreen .confetti {
     animation: confetti-fall-fullscreen 4s ease-out forwards;
 }
 
+/* Congratulations message */
 .congratulations {
     position: absolute;
     top: 150px;
@@ -76,11 +111,23 @@ canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
     opacity: 0;
     z-index: 150;
 }
+
 @keyframes pop-in {
-    0% { transform: translateX(-50%) scale(0.5); opacity: 0; }
-    70% { transform: translateX(-50%) scale(1.2); opacity: 1; }
-    100% { transform: translateX(-50%) scale(1); opacity: 1; }
+    0% {
+        transform: translateX(-50%) scale(0.5);
+        opacity: 0;
+    }
+    70% {
+        transform: translateX(-50%) scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(-50%) scale(1);
+        opacity: 1;
+    }
 }
+
+/* Button styles */
 .play-again-btn {
     position: relative;
     padding: calc(1vh + 1vw) calc(2vh + 2vw);
@@ -91,7 +138,7 @@ canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
     font-weight: bold;
     border-radius: calc(2vh + 2vw);
     border: calc(0.5vh + 0.5vw) solid #CC55DD;
-    box-shadow: 0 calc(0.75vh + 0.75vw) 0 #AA33BB, 
+    box-shadow: 0 calc(0.75vh + 0.75vw) 0 #AA33BB,
                 0 calc(1vh + 1vw) calc(1.25vh + 1.25vw) rgba(0,0,0,0.3);
     cursor: pointer;
     text-align: center;
@@ -100,22 +147,18 @@ canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
     z-index: 200;
     white-space: nowrap;
 }
+
 .play-again-btn:hover {
     transform: rotate(3deg) scale(1.05);
     box-shadow: 0 8px 0 #AA33BB, 0 12px 15px rgba(0,0,0,0.3);
 }
+
 .play-again-btn:active {
     transform: rotate(3deg) scale(0.95) translateY(5px);
     box-shadow: 0 2px 0 #AA33BB, 0 5px 5px rgba(0,0,0,0.3);
 }
-/* Adjust play-again button for fullscreen */
-.fullscreen .play-again-btn {
-    font-size: 36px;
-    padding: 18px 30px;
-    border-width: 7px;
-    box-shadow: 0 8px 0 #AA33BB, 0 10px 15px rgba(0,0,0,0.3);
-}
-/* Splash screen styles */
+
+/* Splash screen */
 #splash-screen {
     position: absolute;
     width: 100%;
@@ -131,6 +174,7 @@ canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
     border: 2px solid #333;
     box-sizing: border-box;
 }
+
 #splash-title {
     font-family: 'Comic Neue', cursive;
     font-size: 48px;
@@ -139,6 +183,7 @@ canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
     margin-bottom: 40px;
     text-align: center;
 }
+
 #start-button {
     padding: 15px 30px;
     background: linear-gradient(to bottom, #FFD86B, #FF9933);
@@ -154,36 +199,45 @@ canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
     transform: rotate(-3deg);
     transition: all 0.2s;
 }
+
 #start-button:hover {
     transform: rotate(3deg) scale(1.05);
     box-shadow: 0 8px 0 #AA33BB, 0 12px 15px rgba(0,0,0,0.3);
 }
+
 #start-button:active {
     transform: rotate(3deg) scale(0.95) translateY(5px);
     box-shadow: 0 2px 0 #AA33BB, 0 5px 5px rgba(0,0,0,0.3);
 }
+
+/* Fullscreen button */
 #fullscreen-btn {
     position: absolute;
-    bottom: 10px;
+    top: 10px;
     right: 10px;
     background-color: rgba(0, 0, 0, 0.5);
     color: white;
-    border: none;
-    border-radius: 5px;
+    border: 2px solid white;
+    border-radius: 8px;
     padding: 8px 12px;
     cursor: pointer;
     font-family: 'Comic Neue', cursive;
-    font-size: 16px;
-    z-index: 1000;
-    transition: background-color 0.3s;
+    font-size: 20px;
+    z-index: 1001;
+    transition: all 0.3s;
 }
+
 #fullscreen-btn:hover {
     background-color: rgba(0, 0, 0, 0.7);
+    transform: scale(1.1);
 }
+
 #fullscreen-btn:active {
     background-color: rgba(0, 0, 0, 0.9);
+    transform: scale(0.95);
 }
-/* Fullscreen styles */
+
+/* Fullscreen mode styles */
 .fullscreen #game-container {
     width: 100vw !important;
     height: 100vh !important;
@@ -226,7 +280,6 @@ canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2), 3px 3px 0 rgba(0, 0, 0, 0.4) !important;
 }
 
-/* Make sure the fullscreen button is visible in fullscreen mode */
 .fullscreen #fullscreen-btn {
     position: fixed !important;
     bottom: 20px !important;
@@ -237,174 +290,121 @@ canvas { border: 2px solid #333; position: absolute; top: 0; left: 0; }
     padding: 10px 15px !important;
 }
 
-/* Mobile-specific styles */
+.fullscreen .play-again-btn {
+    font-size: 36px;
+    padding: 18px 30px;
+    border-width: 7px;
+    box-shadow: 0 8px 0 #AA33BB, 0 10px 15px rgba(0,0,0,0.3);
+}
+
+/* Game selection styles */
+#game-selection {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+    background: linear-gradient(135deg, #4a90e2, #7c4dff);
+}
+
+.game-select-btn {
+    padding: 20px 30px;
+    background: linear-gradient(to bottom, #FFD86B, #FF9933);
+    color: #7722CC;
+    font-family: 'Comic Neue', cursive;
+    font-size: 24px;
+    font-weight: bold;
+    border-radius: 15px;
+    border: 5px solid #CC55DD;
+    box-shadow: 0 6px 0 #AA33BB, 0 8px 10px rgba(0,0,0,0.3);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    min-width: 200px;
+}
+
+.game-select-btn:nth-child(odd) {
+    transform: rotate(-3deg);
+}
+
+.game-select-btn:nth-child(even) {
+    transform: rotate(3deg);
+}
+
+.game-select-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 0 #AA33BB, 0 12px 15px rgba(0,0,0,0.3);
+}
+
+.game-select-btn:active {
+    transform: scale(0.95) translateY(5px);
+    box-shadow: 0 2px 0 #AA33BB, 0 5px 5px rgba(0,0,0,0.3);
+}
+
+/* Exit button */
+.exit-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 20px;
+    background: linear-gradient(to bottom, #ff6b6b, #ff3333);
+    color: white;
+    font-family: 'Comic Neue', cursive;
+    font-size: 20px;
+    font-weight: bold;
+    border-radius: 10px;
+    border: 3px solid #cc3333;
+    box-shadow: 0 4px 0 #aa2222, 0 6px 8px rgba(0,0,0,0.3);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    z-index: 1002;
+}
+
+.exit-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 0 #aa2222, 0 8px 12px rgba(0,0,0,0.3);
+}
+
+.exit-btn:active {
+    transform: scale(0.95) translateY(4px);
+    box-shadow: 0 2px 0 #aa2222, 0 3px 4px rgba(0,0,0,0.3);
+}
+
+/* Mobile styles */
 @media (max-width: 768px) {
     #game-container {
         width: 100vw;
         height: 100vh;
         max-width: 100%;
     }
-    
-    canvas {
-        width: 100% !important;
-        height: auto !important;
-        max-height: 100vh;
-    }
-    
-    .fullscreen canvas {
-        width: 100vw !important;
-        height: 100vh !important;
-        object-fit: contain;
-    }
-    
-    .name-box {
-        font-size: 18px;
-        padding: 6px 10px;
-        min-width: 60px;
-    }
-    
-    #fullscreen-btn {
-        bottom: 10px;
-        right: 10px;
-        padding: 8px 12px;
-        font-size: 14px;
-    }
-}
 
-/* Landscape orientation for mobile */
-    .fullscreen canvas {
-        width: 100vw !important;
-        height: 100vh !important;
-        object-fit: contain;
-    }
-    
-    .name-box {
-        transform-origin: center center;
-    }
-}
-
-/* Add game selection styles */
-#game-selection {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-    padding: 20px;
-    max-width: 800px;
-    width: 100%;
-    justify-items: center;
-    align-items: center;
-}
-
-.game-select-btn {
-    width: 180px;
-    padding: 15px 25px;
-    background: linear-gradient(to bottom, #FFD86B, #FF9933);
-    color: #7722CC;
-    font-family: 'Comic Neue', cursive;
-    font-size: 24px;
-    font-weight: bold;
-    border-radius: 20px;
-    border: 4px solid #CC55DD;
-    box-shadow: 0 6px 0 #AA33BB, 0 8px 10px rgba(0, 0, 0, 0.3);
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.2s;
-    margin: 10px;
-}
-
-/* Make every other button tilt in the opposite direction */
-.game-select-btn:nth-child(odd) {
-    transform: rotate(2deg);
-}
-
-.game-select-btn:nth-child(even) {
-    transform: rotate(-2deg);
-}
-
-.game-select-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 0 #AA33BB, 0 12px 15px rgba(0, 0, 0, 0.3);
-}
-
-.game-select-btn:active {
-    transform: scale(0.95) translateY(5px);
-    box-shadow: 0 2px 0 #AA33BB, 0 5px 5px rgba(0, 0, 0, 0.3);
-}
-
-/* Add responsive design for smaller screens */
-@media (max-width: 768px) {
     #game-selection {
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 15px;
-        padding: 15px;
+        padding: 10px;
     }
 
     .game-select-btn {
-        width: 140px;
         font-size: 20px;
-        padding: 12px 20px;
+        padding: 15px 25px;
+        min-width: 150px;
     }
 }
 
-/* For very small screens */
 @media (max-width: 480px) {
     #game-selection {
-        grid-template-columns: 1fr;
+        padding: 5px;
         gap: 10px;
-        padding: 10px;
     }
 
     .game-select-btn {
-        width: 160px;
-        font-size: 18px;
-        padding: 10px 15px;
-    }
-}
-
-/* For landscape orientation */
-    #game-selection {
-        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-        gap: 10px;
-        padding: 10px;
-        max-height: 80vh;
-        overflow-y: auto;
-    }
-
-    .game-select-btn {
-        width: 120px;
         font-size: 16px;
-        padding: 8px 12px;
+        padding: 12px 20px;
+        min-width: 120px;
+        border-width: 4px;
     }
 }
-
-/* Add this to your existing styles */
-.exit-btn {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 10px 20px;
-    background: linear-gradient(to bottom, #FF6B6B, #FF4444);
-    color: white;
-    font-family: 'Comic Neue', cursive;
-    font-size: 20px;
-    font-weight: bold;
-    border-radius: 15px;
-    border: 4px solid #CC0000;
-    box-shadow: 0 4px 0 #990000, 0 6px 8px rgba(0,0,0,0.3);
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.2s;
-    z-index: 1000;
-}
-
-.exit-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 6px 0 #990000, 0 8px 12px rgba(0,0,0,0.3);
-}
-
-.exit-btn:active {
-    transform: scale(0.95) translateY(2px);
-    box-shadow: 0 2px 0 #990000, 0 3px 4px rgba(0,0,0,0.3);
-}
-
-/* Portrait mode overlay */
