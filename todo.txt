@@ -1,8 +1,8 @@
-Things to maybe do sometimes...
+Things to maybe do sometime...
 - Remove debug printouts
-- ask AI to clean/refactor
+- clean/refactor
 - exit button from game
 - dynamic upload of pictures/sounds
 - load games from github (url)
-- gör alla texter kofigurerbara (spela igen/tillbaka and instructions for how to make start screen icon
-- make a help page with pedagocical infromation
+- Look for any language dependencies (like return/play-again)
+- make a help page with pedagocical information/links
