@@ -6,3 +6,5 @@ Things to maybe do sometime...
 - load games from github (url)
 - Look for any language dependencies (like return/play-again)
 - make a help page with pedagocical information/links
+- the fullscreen return icon does not look ok in certain screen sizes
+- consider to maybe disable screen saver (if possible)

@@ -47,8 +47,8 @@ Completion-sound: complete.mp3
 Fail-sound: fail.mp3
 Item 1: "Apelsin", apelsin.jpg, wow.mp3
 Item 2: "Äpple", apple.jpg, skratt.mp3
-Item 3: "Avokado", avokado.jpg, avokado.mp3
-Item 4: "Jordgubbe", jordgubbe.jpg, yummi.mp3
+Item 3: "Päron", paron.jpg, avokado.mp3
+Item 4: "Banan", banan.jpg, yummi.mp3
 
 Game:5
 Name: "Stad"
@@ -86,3 +86,15 @@ Item 1: "Katt", katt.jpg, katt.mp3
 Item 2: "Hund", hund.jpg, hund.mp3
 Item 3: "Kanin", kanin.jpg, kanin.mp3
 Item 4: "Mus", mus.jpg, mus.mp3 
+
+Game:7
+Name: "Skog"
+Directory: ./Skog
+Background-image: background.jpg
+Background-sound: backgroundsound.mp3
+Completion-sound: complete.mp3
+Fail-sound: wrong.mp3
+Item 1: "Svampar", svamp.jpg, bra1.mp3
+Item 2: "Kottar", kottar.jpg, bra2.mp3
+Item 3: "Sten", sten.jpg, bra3.mp3
+Item 4: "Träd", trad.jpg, bra4.mp3 
